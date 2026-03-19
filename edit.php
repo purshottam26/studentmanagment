@@ -7,6 +7,7 @@ if(!isset($_GET['id'])){
 }
 
 $id = $_GET['id'];
+$error = $_GET['error'] ?? "";
 
 $query = "SELECT * FROM student WHERE id='$id'";
 $result = mysqli_query($conn,$query);
@@ -30,7 +31,9 @@ if(!$row){
 <h2>Edit Student</h2>
 
 <div class="edit-box">
-
+<?php if(!empty($error)){ ?>
+<div class="alert-dangeor error"><?php echo $error ?></div>
+<?php } ?>
 <form method="POST" action="update.php" enctype="multipart/form-data">
 
 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
@@ -49,6 +52,9 @@ if(!$row){
 
 <label>Aadhaar</label>
 <input type="text" name="aadhaar" value="<?php echo $row['aadhaar']; ?>">
+<?php if(!empty($_GET['error_aadhar'])){ ?>
+<div class="alert-dangeor error"><?php echo $_GET['error_aadhar'] ?></div>
+<?php } ?>
 
 <label>Mobile</label>
 <input type="text" name="mobile" value="<?php echo $row['mobile']; ?>">

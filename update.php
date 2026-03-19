@@ -18,7 +18,9 @@ exit();
 }
 
 if(strlen($aadhaar) != 12){
-echo "Aadhaar number must be 12 digits";
+$error_messag = "Aadhaar number must be 12 digits";
+$redirect_url = "edit.php?id=$id&error=$error_messag";
+header("Location: $redirect_url");
 exit();
 }
 
