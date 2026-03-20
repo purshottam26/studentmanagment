@@ -6,6 +6,17 @@ if(!isset($_SESSION['admin'])){
 }
 include 'db.php';
 
+/* 🔥 Graph Data */
+$graph_query = mysqli_query($conn, "SELECT course, COUNT(*) as total FROM student GROUP BY course");
+
+$course_names = [];
+$course_counts = [];
+
+while($row = mysqli_fetch_assoc($graph_query)){
+    $course_names[] = $row['course'];
+    $course_counts[] = $row['total'];
+}
+
 /* Pagination */
 $limit = 5;
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
@@ -39,6 +50,10 @@ $total_pages = ceil($total_records / $limit);
 <meta charset="UTF-8">
 <title>Students</title>
 <link rel="stylesheet" href="style.css">
+
+<!-- 🔥 Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -58,6 +73,12 @@ $total_pages = ceil($total_records / $limit);
 
 <div class="topbar">
 <h1>Students Management</h1>
+</div>
+
+<!-- 🔥 GRAPH SECTION -->
+<div style="background:white; padding:20px; border-radius:10px; margin-bottom:20px;">
+<h2 style="color:black;">Students Per Course</h2>
+<canvas id="myChart"></canvas>
 </div>
 
 <!-- Add Student -->
@@ -132,7 +153,13 @@ value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
 <tr>
 
 <td><?php echo $row['student_id']; ?></td>
-<td><?php echo $row['name']; ?></td>
+
+<td>
+<a href="profile.php?id=<?php echo $row['id']; ?>" style="color:#667eea; font-weight:bold;">
+<?php echo $row['name']; ?>
+</a>
+</td>
+
 <td><?php echo $row['email']; ?></td>
 <td><?php echo $row['course']; ?></td>
 <td><?php echo $row['aadhaar']; ?></td>
@@ -169,9 +196,30 @@ echo "<a href='?page=".$i."' style='padding:8px 12px;margin:3px;background:#667e
 
 </div>
 
-</div> <!-- content -->
+</div>
+</div>
 
-</div> <!-- main-container -->
+<!-- 🔥 GRAPH SCRIPT -->
+<script>
+const ctx = document.getElementById('myChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($course_names); ?>,
+        datasets: [{
+            label: 'Students',
+            data: <?php echo json_encode($course_counts); ?>,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
 
 </body>
 </html>
