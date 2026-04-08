@@ -29,9 +29,26 @@ if(!$row){
 
 <body>
 
+<div class="main-container">
+
+<!-- Sidebar -->
+<div class="sidebar">
+<h2>Admin Panel</h2>
+<a href="index.php">Dashboard</a>
+<a href="students.php">Students</a>
+<a href="logout.php">Logout</a>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+<div class="topbar">
+<h1>Edit Student</h1>
+</div>
+
 <h2>Edit Student</h2>
 
-<div class="edit-box">
+<div class="form-box">
 
 <form method="POST" action="update.php" enctype="multipart/form-data">
 
@@ -93,6 +110,10 @@ value="<?php echo $_POST['pincode'] ?? $row['pincode']; ?>">
 </form>
 
 </div>
+
+</div> <!-- content -->
+
+</div> <!-- main-container -->
 
 </body>
 </html>

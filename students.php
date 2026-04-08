@@ -6,7 +6,7 @@ if(!isset($_SESSION['admin'])){
 }
 include 'db.php';
 
-/* 🔥 Graph Data */
+/* Graph Data */
 $graph_query = mysqli_query($conn, "SELECT course, COUNT(*) as total FROM student GROUP BY course");
 
 $course_names = [];
@@ -50,10 +50,7 @@ $total_pages = ceil($total_records / $limit);
 <meta charset="UTF-8">
 <title>Students</title>
 <link rel="stylesheet" href="style.css">
-
-<!-- 🔥 Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
 
 <body>
@@ -72,134 +69,117 @@ $total_pages = ceil($total_records / $limit);
 <div class="content">
 
 <div class="topbar">
-<h1>Students Management</h1>
+<h1 style="color:#000;">Students Management</h1>
 </div>
 
-<!-- 🔥 GRAPH SECTION -->
-<div style="background:white; padding:20px; border-radius:10px; margin-bottom:20px;">
-<h2 style="color:black;">Students Per Course</h2>
+<!-- Graph -->
+<div class="graph-box">
+<h2 style="color:#000;">Students Per Course</h2>
 <canvas id="myChart"></canvas>
 </div>
 
-<!-- Add Student -->
+<!-- MAIN LAYOUT -->
+<div class="student-container">
 
-<h2>Add Student</h2>
+    <!-- LEFT FORM -->
+    <div class="form-section">
+        <h2>Add Student</h2>
 
-<form method="POST" action="insert.php" enctype="multipart/form-data">
+        <form method="POST" action="insert.php" enctype="multipart/form-data">
 
-<label>Student ID</label>
-<input type="text" name="student_id" required>
+        <label>Student ID</label>
+        <input type="text" name="student_id" required>
 
-<label>Name</label>
-<input type="text" name="name" pattern="[A-Za-z ]+" required>
+        <label>Name</label>
+        <input type="text" name="name" required>
 
-<label>Email</label>
-<input type="email" name="email" required>
+        <label>Email</label>
+        <input type="email" name="email" required>
 
-<label>Course</label>
-<input type="text" name="course" required>
+        <label>Course</label>
+        <input type="text" name="course" required>
 
-<label>Aadhaar</label>
-<input type="text" name="aadhaar" pattern="[0-9]{12}" maxlength="12" required>
+        <label>Aadhaar</label>
+        <input type="text" name="aadhaar" required>
 
-<label>Mobile</label>
-<input type="text" name="mobile" pattern="[0-9]{10}" maxlength="10" required>
+        <label>Mobile</label>
+        <input type="text" name="mobile" required>
 
-<label>Pin Code</label>
-<input type="text" name="pincode" pattern="[0-9]{6}" maxlength="6" required>
+        <label>Pin Code</label>
+        <input type="text" name="pincode" required>
 
-<label>Photo</label>
-<input type="file" name="photo" accept="image/*">
+        <label>Photo</label>
+        <input type="file" name="photo">
 
-<br><br>
-<button type="submit">Add Student</button>
+        <button type="submit">Add Student</button>
 
-</form>
+        </form>
+    </div>
 
-<hr>
+        <!-- TABLE -->
+        <table>
+        <tr>
+        <th>Student ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Course</th>
+        <th>Aadhaar</th>
+        <th>Mobile</th>
+        <th>Pin Code</th>
+        <th>Photo</th>
+        <th>Action</th>
+        </tr>
 
-<!-- Student List -->
+        <?php while($row = mysqli_fetch_assoc($result)){ ?>
 
-<h2>Student List</h2>
+        <tr>
+        <td><?php echo $row['student_id']; ?></td>
 
-<a href="export.php" class="btn-export">Download Excel</a>
+        <td>
+        <a href="profile.php?id=<?php echo $row['id']; ?>">
+        <?php echo $row['name']; ?>
+        </a>
+        </td>
 
-<br><br>
+        <td><?php echo $row['email']; ?></td>
+        <td><?php echo $row['course']; ?></td>
+        <td><?php echo $row['aadhaar']; ?></td>
+        <td><?php echo $row['mobile']; ?></td>
+        <td><?php echo $row['pincode']; ?></td>
 
-<form method="GET">
-<input type="text" name="search" placeholder="Search by name or email"
-value="<?php if(isset($_GET['search'])) echo $_GET['search']; ?>">
-<button type="submit">Search</button>
-</form>
+        <td>
+        <?php if(!empty($row['photo'])){ ?>
+        <img src="uploads/<?php echo $row['photo']; ?>" width="50">
+        <?php } else { echo "No Photo"; } ?>
+        </td>
 
-<br>
+        <td class="action-btn">
+        <a href="edit.php?id=<?php echo $row['id']; ?>">Edit</a>
+        <a href="delete.php?id=<?php echo $row['id']; ?>">Delete</a>
+        </td>
 
-<table>
+        </tr>
 
-<tr>
-<th>Student ID</th>
-<th>Name</th>
-<th>Email</th>
-<th>Course</th>
-<th>Aadhaar</th>
-<th>Mobile</th>
-<th>Pin Code</th>
-<th>Photo</th>
-<th>Action</th>
-</tr>
+        <?php } ?>
+        </table>
 
-<?php while($row = mysqli_fetch_assoc($result)){ ?>
+        <!-- PAGINATION -->
+        <div style="margin-top:20px;">
+        <?php
+        for($i=1;$i<=$total_pages;$i++){
+        echo "<a href='?page=".$i."' style='padding:8px 12px;margin:3px;background:#3b82f6;color:white;border-radius:5px;text-decoration:none;'>".$i."</a>";
+        }
+        ?>
+        </div>
 
-<tr>
-
-<td><?php echo $row['student_id']; ?></td>
-
-<td>
-<a href="profile.php?id=<?php echo $row['id']; ?>" style="color:#667eea; font-weight:bold;">
-<?php echo $row['name']; ?>
-</a>
-</td>
-
-<td><?php echo $row['email']; ?></td>
-<td><?php echo $row['course']; ?></td>
-<td><?php echo $row['aadhaar']; ?></td>
-<td><?php echo $row['mobile']; ?></td>
-<td><?php echo $row['pincode']; ?></td>
-
-<td>
-<?php if(!empty($row['photo'])){ ?>
-<img src="uploads/<?php echo $row['photo']; ?>" width="50">
-<?php } else { echo "No Photo"; } ?>
-</td>
-
-<td class="action-btn">
-<a href="edit.php?id=<?php echo $row['id']; ?>">Edit</a><br><br>
-<a href="delete.php?id=<?php echo $row['id']; ?>">Delete</a><br><br>
-<a href="documents.php?id=<?php echo $row['id']; ?>">Documents</a>
-</td>
-
-</tr>
-
-<?php } ?>
-
-</table>
-
-<!-- Pagination -->
-
-<div style="margin-top:20px;">
-
-<?php
-for($i=1;$i<=$total_pages;$i++){
-echo "<a href='?page=".$i."' style='padding:8px 12px;margin:3px;background:#667eea;color:white;border-radius:5px;text-decoration:none;'>".$i."</a>";
-}
-?>
+    </div>
 
 </div>
 
 </div>
 </div>
 
-<!-- 🔥 GRAPH SCRIPT -->
+<!-- Chart -->
 <script>
 const ctx = document.getElementById('myChart');
 
@@ -210,7 +190,7 @@ new Chart(ctx, {
         datasets: [{
             label: 'Students',
             data: <?php echo json_encode($course_counts); ?>,
-            borderWidth: 1
+            backgroundColor:'#3b82f6'
         }]
     },
     options: {
